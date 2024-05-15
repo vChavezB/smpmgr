@@ -12,6 +12,7 @@ from smp.exceptions import SMPBadStartDelimiter
 from smpclient import SMPClient
 from smpclient.generics import SMPRequest, TEr0, TEr1, TErr, TRep
 from smpclient.transport.serial import SMPSerialTransport
+from smpclient.transport.can import SMPCANTransport, CANDevice
 
 logger = logging.getLogger(__name__)
 
@@ -31,15 +32,21 @@ class Options:
     timeout: float
     transport: TransportDefinition
     mtu: int
+    can: CANDevice
 
 
 def get_custom_smpclient(options: Options, smp_client_cls: Type[TSMPClient]) -> TSMPClient:
     """Return an `SMPClient` subclass to the chosen transport or raise `typer.Exit`."""
-    if options.transport.port is not None:
+    if options.can is not None:
+        logger.info(
+            f"Initializing SMPClient with the SMPCANTransport, {options.can}"
+        )
+        return smp_client_cls(SMPCANTransport(mtu=options.mtu,device=options.can), options.transport.port)
+    elif options.transport.port is not None and options.can is None:
         logger.info(
             f"Initializing SMPClient with the SMPSerialTransport, {options.transport.port=}"
         )
-        return smp_client_cls(SMPSerialTransport(mtu=options.mtu), options.transport.port)
+        return smp_client_cls(SMPSerialTransport(mtu=options.mtu), options.transport.port)        
     else:
         typer.echo(
             f"A transport option is required; "

@@ -13,6 +13,7 @@ from smpclient.generics import error, success
 from smpclient.mcuboot import IMAGE_TLV, ImageInfo, TLVNotFound
 from smpclient.requests.image_management import ImageStatesWrite
 from smpclient.requests.os_management import ResetWrite
+from smpclient.transport.can import CANDevice
 from typing_extensions import Annotated
 
 from smpmgr import image_management, os_management, terminal
@@ -47,6 +48,9 @@ def options(
     port: str = typer.Option(
         None, help="The serial port to connect to, e.g. COM1, /dev/ttyACM0, etc."
     ),
+    can: CANDevice = typer.Option(
+        None, help="CAN Transport Layer"
+    ),
     timeout: float = typer.Option(
         2.0, help="Transport timeout in seconds; how long to wait for requests"
     ),
@@ -67,7 +71,7 @@ def options(
 
     setup_logging(loglevel, logfile)
 
-    ctx.obj = Options(timeout=timeout, transport=TransportDefinition(port=port), mtu=mtu)
+    ctx.obj = Options(timeout=timeout, transport=TransportDefinition(port=port), mtu=mtu, can=can)
     logger.info(ctx.obj)
 
     if ctx.invoked_subcommand is None:
