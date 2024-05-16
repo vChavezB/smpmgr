@@ -33,6 +33,8 @@ class Options:
     transport: TransportDefinition
     mtu: int
     can: CANDevice
+    can_rx: int
+    can_tx: int
 
 
 def get_custom_smpclient(options: Options, smp_client_cls: Type[TSMPClient]) -> TSMPClient:
@@ -41,12 +43,16 @@ def get_custom_smpclient(options: Options, smp_client_cls: Type[TSMPClient]) -> 
         logger.info(
             f"Initializing SMPClient with the SMPCANTransport, {options.can}"
         )
-        return smp_client_cls(SMPCANTransport(mtu=options.mtu,device=options.can), options.transport.port)
+        transport = SMPCANTransport(mtu=options.mtu,
+                                    device=options.can,
+                                    rx_id=options.can_rx,
+                                    tx_id=options.can_tx)
+        return smp_client_cls(transport, options.transport.port)
     elif options.transport.port is not None and options.can is None:
         logger.info(
             f"Initializing SMPClient with the SMPSerialTransport, {options.transport.port=}"
         )
-        return smp_client_cls(SMPSerialTransport(mtu=options.mtu), options.transport.port)        
+        return smp_client_cls(SMPSerialTransport(mtu=options.mtu), options.transport.port)
     else:
         typer.echo(
             f"A transport option is required; "
@@ -64,7 +70,7 @@ def get_smpclient(options: Options) -> SMPClient:
 async def connect_with_spinner(smpclient: SMPClient) -> None:
     """Spin while connecting to the SMP Server; raises `typer.Exit` if connection fails."""
     with Progress(
-        SpinnerColumn(), TextColumn("[progress.description]{task.description}")
+            SpinnerColumn(), TextColumn("[progress.description]{task.description}")
     ) as progress:
         connect_task_description = f"Connecting to {smpclient._address}..."
         connect_task = progress.add_task(description=connect_task_description, total=None)
@@ -86,13 +92,13 @@ async def connect_with_spinner(smpclient: SMPClient) -> None:
 
 
 async def smp_request(
-    smpclient: SMPClient,
-    options: Options,
-    request: SMPRequest[TRep, TEr0, TEr1, TErr],
-    description: str | None = None,
+        smpclient: SMPClient,
+        options: Options,
+        request: SMPRequest[TRep, TEr0, TEr1, TErr],
+        description: str | None = None,
 ) -> TRep | TErr:
     with Progress(
-        SpinnerColumn(), TextColumn("[progress.description]{task.description}")
+            SpinnerColumn(), TextColumn("[progress.description]{task.description}")
     ) as progress:
         description = description or f"Waiting for response to {request.__class__.__name__}..."
         task = progress.add_task(description=description, total=None)

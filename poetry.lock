@@ -1197,9 +1197,9 @@ smp = "^0.3.4"
 
 [package.source]
 type = "git"
-url = "https://github.com/vchavezb/smpclient"
+url = "https://github.com/vchavezB/smpclient"
 reference = "can"
-resolved_reference = "f03be3327683bd21365ca35ec677106c2426dac1"
+resolved_reference = "b5199a11cb8f5637cf6d5c9a55e583ffdcc27d59"
 
 [[package]]
 name = "tomli"
@@ -1558,4 +1558,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.13"
-content-hash = "eba149520cebf2fb0fe48f33f779173daaea8a54685a819f53f39768149f5341"
+content-hash = "ec24e49adea3add2a06019d1b8e253e2ffc921f4e2e9391b44a8d4861da80189"

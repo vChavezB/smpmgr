@@ -51,6 +51,14 @@ def options(
     can: CANDevice = typer.Option(
         None, help="CAN Transport Layer"
     ),
+    can_tx: int = typer.Option(
+        0xBEEF, help="CAN TX ID [SMP Client to Zephyr Device]. Should match CONFIG_MCUBOOT_CAN_RX_ID",
+        max = 0x1FFFFFFF
+    ),
+    can_rx: int = typer.Option(
+        0xDEAD, help="CAN RX ID [Zephyr Device SMP Client]. Should match CONFIG_MCUBOOT_CAN_TX_ID",
+        max = 0x1FFFFFFF
+    ),
     timeout: float = typer.Option(
         2.0, help="Transport timeout in seconds; how long to wait for requests"
     ),
@@ -71,7 +79,8 @@ def options(
 
     setup_logging(loglevel, logfile)
 
-    ctx.obj = Options(timeout=timeout, transport=TransportDefinition(port=port), mtu=mtu, can=can)
+    ctx.obj = Options(timeout=timeout, transport=TransportDefinition(port=port), mtu=mtu,
+                      can=can, can_tx=can_tx, can_rx=can_rx)
     logger.info(ctx.obj)
 
     if ctx.invoked_subcommand is None:
