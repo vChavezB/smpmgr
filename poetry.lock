@@ -1199,7 +1199,7 @@ smp = "^0.3.4"
 type = "git"
 url = "https://github.com/vchavezB/smpclient"
 reference = "can"
-resolved_reference = "b5199a11cb8f5637cf6d5c9a55e583ffdcc27d59"
+resolved_reference = "6c19f3994395156f55a1a1e62232015ad3cbe634"
 
 [[package]]
 name = "tomli"
