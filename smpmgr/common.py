@@ -10,7 +10,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from serial import SerialException
 from smp.exceptions import SMPBadStartDelimiter
 from smpclient import SMPClient
-from smpclient.generics import SMPRequest, TEr0, TEr1, TErr, TRep
+from smpclient.generics import SMPRequest, TEr1, TEr2, TRep
 from smpclient.transport.serial import SMPSerialTransport
 from smpclient.transport.can import SMPCANTransport, CANDevice
 
@@ -43,8 +43,7 @@ def get_custom_smpclient(options: Options, smp_client_cls: Type[TSMPClient]) -> 
         logger.info(
             f"Initializing SMPClient with the SMPCANTransport, {options.can}"
         )
-        transport = SMPCANTransport(mtu=options.mtu,
-                                    device=options.can,
+        transport = SMPCANTransport(device=options.can,
                                     rx_id=options.can_rx,
                                     tx_id=options.can_tx)
         return smp_client_cls(transport, options.transport.port)
@@ -94,9 +93,9 @@ async def connect_with_spinner(smpclient: SMPClient) -> None:
 async def smp_request(
         smpclient: SMPClient,
         options: Options,
-        request: SMPRequest[TRep, TEr0, TEr1, TErr],
+        request: SMPRequest[TRep, TEr1, TEr2],
         description: str | None = None,
-) -> TRep | TErr:
+) -> TRep:
     with Progress(
             SpinnerColumn(), TextColumn("[progress.description]{task.description}")
     ) as progress:
